@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ariadnext-home.jpeg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
