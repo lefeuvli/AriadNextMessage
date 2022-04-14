@@ -40,12 +40,24 @@ class MessageCell: UITableViewCell {
             aknowledgeImageView.layer.cornerRadius = aknowledgeImageView.bounds.width / 2
             aknowledgeImageView.layer.borderWidth = 1
             aknowledgeImageView.layer.borderColor = currentColor.cgColor
+        } else {
+            aknowledgeImageView.image = imageAknowledge
         }
+        
         aknowledgeImageView.tintColor = currentColor
+        if message.acknowledgeState == .notSend {
+            aknowledgeImageView.tintColor = .red
+        }
         
         messageStackView.backgroundColor = currentColor
         messageLabel.textAlignment = message.isFromServer ? .left : .right
         dateLabel.textAlignment = message.isFromServer ? .left : .right
         aknowledgeImageView.isHidden = message.isFromServer
+    }
+    
+    override func prepareForReuse() {
+        aknowledgeImageView.image = UIImage(named: Images.more.rawValue)
+        aknowledgeImageView.layer.borderWidth = 0
+        aknowledgeImageView.layer.cornerRadius = 0
     }
 }

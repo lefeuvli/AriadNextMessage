@@ -31,14 +31,29 @@ class HomeViewModel {
     
     func didTapOnSendMessage(text: String) {
         // Create message with text content
-        let message = Message(contentText: text,
+        var message = Message(contentText: text,
                               contentDate: Date(),
                               acknowledgeState: .send)
         
         // Add message in view behaviour stack
         behaviourMessage?.onNext(message)
         
-        // Send message on server
+        if homeCoordinator?.isMessageServerStarted() ?? false {
+            // Send message on server
+            sendMessage(message)
+        } else {
+            homeCoordinator?.showServerOffAlert(
+                startCompletion: {
+                    self.sendMessage(message)
+                },
+                stopCompletion: {
+                    message.acknowledgeState = .notSend
+                    self.behaviourMessage?.onNext(message)
+                })
+        }
+    }
+    
+    private func sendMessage(_ message: Message) {
         _ = MessageService.send(message: message)
             .subscribe { newMessages in
                 DispatchQueue.main.async {
@@ -50,6 +65,9 @@ class HomeViewModel {
                 print("ERROR : \(error)")
             } onDisposed: {
             }
-
+    }
+    
+    func didTapOnSettings() {
+        homeCoordinator?.handleTapOnSettings()
     }
 }

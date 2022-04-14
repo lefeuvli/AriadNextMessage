@@ -11,4 +11,5 @@ import Foundation
 public enum Images: String {
     case more
     case check
+    case settings
 }

@@ -9,6 +9,8 @@ import XCTest
 @testable import AriadNextMessage
 
 class AriadNextMessageTests: XCTestCase {
+    
+    var messageServer = MessageServer()
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -16,21 +18,33 @@ class AriadNextMessageTests: XCTestCase {
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+        messageServer.stop()
     }
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    func testRandomResponse() throws {
+        let requestText = "ariadNext"
+        let response = messageServer.getRandomMessageResponse(number: 2, request: requestText)
+        
+        XCTAssertEqual(response.acknowledgeState, .received)
+        XCTAssertTrue(response.contentText.contains(requestText), "Message must contain : \(requestText)")
     }
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func testSendMessage() throws {
+        messageServer.start()
+        let messageText = "Hello ariadNext"
+        let sendMessage = Message(contentText: messageText,
+                                  contentDate: Date(),
+                                  acknowledgeState: .send)
+        _ = MessageService.send(message: sendMessage).subscribe { messages in
+            XCTAssertEqual(messages.count, 2)
+            XCTAssertEqual(messages[0].acknowledgeState, .received)
+            XCTAssertTrue(messages[1].contentText.contains(messageText))
+        } onFailure: { error in
+            XCTFail("Error during send message : \(error)")
+        } onDisposed: {
+            
         }
+
     }
 
 }

@@ -17,8 +17,6 @@ class HomeViewController: UIViewController {
     @IBOutlet weak var sendButton: UIButton!
     @IBOutlet weak var bottomViewConstraint: NSLayoutConstraint!
     
-    private weak var coordinator: AppCoordinator?
-    
     private var viewModel: HomeViewModel?
     private var disposeBag = DisposeBag()
     
@@ -44,8 +42,19 @@ class HomeViewController: UIViewController {
         
         sendButton.layer.cornerRadius = 6
         messageTextField.delegate = self
+        
+        // Configure view on keyboard appear and disappear
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardAppear(_:)), name: UIViewController.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDisappear(_:)), name: UIViewController.keyboardWillHideNotification, object: nil)
+        
+        // Add settings button
+        self.title = "Support"
+        self.navigationController?.navigationBar.isTranslucent = true
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: Images.settings.rawValue),
+                                                            style: .plain,
+                                                            target: self,
+                                                            action: #selector(tapOnSettings))
+        navigationItem.rightBarButtonItem?.tintColor = .black
         
         setupObserver()
     }
@@ -61,6 +70,9 @@ class HomeViewController: UIViewController {
                     }
                     
                     self.tableView.reloadData()
+                    self.tableView.scrollToRow(at: IndexPath(row: self.messages.count - 1, section: 0),
+                                               at: .bottom,
+                                               animated: false)
                 },
                 onError: nil,
                 onCompleted: nil,
@@ -79,6 +91,10 @@ class HomeViewController: UIViewController {
         bottomViewConstraint.constant = 16
     }
     
+    @objc func tapOnSettings() {
+        viewModel?.didTapOnSettings()
+    }
+    
     @IBAction func dismissKeyboard(_ sender: Any) {
         messageTextField.resignFirstResponder()
     }
@@ -87,6 +103,7 @@ class HomeViewController: UIViewController {
         // Check message is not empty before send it
         if let message = messageTextField.text, !message.isEmpty {
             viewModel?.didTapOnSendMessage(text: message)
+            // Reinit text field
             messageTextField.text = ""
         }
     }

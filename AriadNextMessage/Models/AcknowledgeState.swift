@@ -11,4 +11,5 @@ import Foundation
 public enum AcknowledgeState: String, Codable {
     case send
     case received
+    case notSend
 }

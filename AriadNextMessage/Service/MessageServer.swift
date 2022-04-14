@@ -64,7 +64,9 @@ public class MessageServer {
     
     public func stop() {
         print("STOP SERVER")
+        server = nil
         task?.cancel()
+        task = nil
     }
     
     /**
@@ -92,7 +94,7 @@ public class MessageServer {
         case 4:
             messageContent = "We cannot do anything about this request : \n \"\(request)\""
         case 5:
-            messageContent = "Received 5/5 ! \nWe are working hard to answer your question."
+            messageContent = "Received 5/5 ! \nWe are working hard to answer your question.\n \"\(request)\""
         default:
             messageContent = "We have received your request :\n \"\(request)\"\nCan you tell us more ?"
         }
